@@ -1,5 +1,6 @@
 package com.example.vilma.sportsscore;
 
+import android.content.SharedPreferences;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -11,6 +12,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -66,6 +68,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+        String competitionID;
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {
+            competitionID = bundle.getString("competitionID");
+        }
     }
 
 
@@ -132,10 +140,10 @@ public class MainActivity extends AppCompatActivity {
                 case 0:
                     return "TEAMS";
                 case 1:
-                    return "TOURNAMENTS";
+                    return "LEAGUE TABLE";
 
                 case 2:
-                    return "SCORES";
+                    return "FIXTURES";
             }
             return null;
         }

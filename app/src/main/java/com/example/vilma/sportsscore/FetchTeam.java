@@ -2,9 +2,7 @@ package com.example.vilma.sportsscore;
 
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.ImageView;
-import android.widget.TextView;
-
+import android.widget.ListView;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -14,17 +12,13 @@ import org.json.JSONObject;
 
 public class FetchTeam extends AsyncTask<String, Void, String> {
 
-    private TextView mNameText;
-    private TextView mNicknameText;
-    private TextView mMVText;
-    private ImageView mLogo;
     private static final String LOG_TAG = NetworkUtils.class.getSimpleName();
+    TeamAdapter teamsAdapter;
+    ListView teamsList;
 
-    public FetchTeam(TextView nameText, TextView nicknameText, TextView MVText, ImageView logo){
-        this.mNameText = nameText;
-        this.mNicknameText = nicknameText;
-        this.mMVText = MVText;
-        this.mLogo = logo;
+    public FetchTeam(TeamAdapter teamsAdapter, ListView teamsList) {
+        this.teamsAdapter = teamsAdapter;
+        this.teamsList = teamsList;
     }
 
     @Override
@@ -36,7 +30,6 @@ public class FetchTeam extends AsyncTask<String, Void, String> {
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
 
-
         try {
             JSONObject jsonObject = new JSONObject(s);
 
@@ -44,33 +37,31 @@ public class FetchTeam extends AsyncTask<String, Void, String> {
             Log.d(LOG_TAG, "teamsarray: "+teamsArray);
 
             for (int i = 0; i < teamsArray.length(); i++) {
-                JSONObject team = teamsArray.getJSONObject(i);
+                JSONObject teamObj = teamsArray.getJSONObject(i);
+                String id = null;
+                String fixtures = null;
+                String players = null;
                 String name = null;
-                String shortname = null;
                 String squadMarketValue = null;
-                String logo = null;
-
 
                 try {
-                    name = team.getString("name");
-                    shortname = team.getString("shortName");
+                    JSONObject linksObj = teamObj.getJSONObject("_links");
+                    JSONObject idLink = linksObj.getJSONObject("self");
+                    id = idLink.getString("href");
+                    JSONObject fixturesLink = linksObj.getJSONObject("fixtures");
+                    fixtures = fixturesLink.getString("href");
+                    JSONObject playersLink = linksObj.getJSONObject("players");
+                    players = playersLink.getString("href");
+
+                    name = teamObj.getString("name");
+                    squadMarketValue = teamObj.getString("squadMarketValue");
+                    Team team = new Team(id,fixtures,players, name, squadMarketValue);
+                    teamsAdapter.add(team);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
-                //If items exist,  update textviews and returns
-                if (name != null) {
-                    mNameText.setText(name);
-                    mNicknameText.setText(shortname);
-                    mMVText.setText(squadMarketValue);
-                    return;
-                }
             }
-
-            mNameText.setText("Nope results found");
         }catch (Exception e){
-            mNameText.setText("No results found");
-            mNicknameText.setText("");
             e.printStackTrace();
         }
     }

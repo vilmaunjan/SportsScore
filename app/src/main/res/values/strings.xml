@@ -3,11 +3,23 @@
     <string name="title_activity_main">MainActivity</string>
     <string name="action_settings">Settings</string>
     <string name="section_format">Hello World from section: %1$d</string>
-    <string name="tab_text_1">Tab 1</string>
-    <string name="tab_text_2">Tab 2</string>
-    <string name="tab_text_3">Tab 3</string>
+    <string name="tab_text_1">TEAMS</string>
+    <string name="tab_text_2">LEAGUE TABLE</string>
+    <string name="tab_text_3">FIXTURES</string>
     <string name="input_hint">Enter a team name</string>
     <string name="search_button_text">Search Teams</string>
 
+    <string-array name="season_array">
+        <item>2018</item>
+        <item>2017</item>
+        <item>2016</item>
+        <item>2015</item>
+        <item>2014</item>
+        <item>2013</item>
+        <item>2012</item>
+        <item>2011</item>
+        <item>2010</item>
+        <item>2009</item>
+    </string-array>
 
 </resources>
