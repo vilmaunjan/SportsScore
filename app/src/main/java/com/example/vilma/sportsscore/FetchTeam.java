@@ -12,7 +12,7 @@ import org.json.JSONObject;
 
 public class FetchTeam extends AsyncTask<String, Void, String> {
 
-    private static final String LOG_TAG = NetworkUtils.class.getSimpleName();
+    private static final String LOG_TAG = FetchTeam.class.getSimpleName();
     TeamAdapter teamsAdapter;
     ListView teamsList;
 

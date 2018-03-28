@@ -7,13 +7,13 @@
     tools:context="com.example.vilma.sportsscore.MainActivity">
 
     <ImageView
-        android:id="@+id/imageView2"
+        android:id="@+id/imageView5"
         android:layout_width="match_parent"
-        android:layout_height="157dp"
-        app:srcCompat="@drawable/players" />
+        android:layout_height="159dp"
+        app:srcCompat="@drawable/fan" />
 
     <ListView
-        android:id="@+id/listTeams"
+        android:id="@+id/listTeamFixtures"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

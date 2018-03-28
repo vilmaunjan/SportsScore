@@ -7,10 +7,18 @@
     android:orientation="vertical"
     tools:context="com.example.vilma.sportsscore.LoginActivity">
 
+    <ImageView
+        android:id="@+id/imageView6"
+        android:layout_width="match_parent"
+        android:layout_height="184dp"
+        app:srcCompat="@drawable/wallpaper" />
+
     <Spinner
         android:id="@+id/seasonSpinner"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="35dp"
+        android:background="@color/colorGrayTransparent"
+        android:textAlignment="center" />
 
     <ListView
         android:id="@+id/competitionsList"

@@ -1,5 +1,7 @@
 package com.example.vilma.sportsscore;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.PictureDrawable;
@@ -22,6 +24,8 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.Route;
 
+import static android.content.Context.MODE_PRIVATE;
+
 /**
  * Created by Vilma on 3/21/2018.
  */
@@ -34,120 +38,29 @@ public class NetworkUtils {
     private static final String MAX_RESULTS = "maxResults"; //Parameter that limits search results
     private static final String API_TOKEN = "01238bb38ddc413fb98fbfb568d9f561";
 
-    static String getAPIInfo(String queryString, String url){
-        //"http://api.football-data.org/v1/competitions/
-        HttpURLConnection urlConnection = null;
-        BufferedReader reader = null;
-        String JSONString = null;
+    static String getCompetitionsInfo(String queryString){
 
-        try {
-            //Build up your query URI limiting results to 10 items and printed books
-            Uri builtUri = Uri.parse("http://api.football-data.org/v1/competitions/").buildUpon()
-                    .appendQueryParameter("season", queryString)
-                    .appendQueryParameter(MAX_RESULTS, "10")
-                    .build();
+        String competitionJSONString = null;
+        String URL = "http://api.football-data.org/v1/competitions/";
 
-            URL requestURL = new URL(builtUri.toString());
-
-            urlConnection = (HttpURLConnection) requestURL.openConnection();
-            urlConnection.setRequestMethod("GET");
-            urlConnection.setRequestProperty("X-Auth-Token", API_TOKEN);
-            urlConnection.connect();
-
-            //Read the response using an inputStream and a StringBuffer, then convert it to a String
-            InputStream inputStream = urlConnection.getInputStream();
-            StringBuffer buffer = new StringBuffer();
-            if(inputStream == null){
-                return null;
-            }
-            reader = new BufferedReader(new InputStreamReader(inputStream));
-            String line;
-            while((line = reader.readLine()) != null){
-                buffer.append(line +"\n");
-            }
-            if(buffer.length() == 0){
-                Log.d(LOG_TAG, "Buffer empty "); //Stream was empty. No point in parsing.
-                return null;
-            }
-            JSONString = buffer.toString();
-            Log.d(LOG_TAG, "the competitions JSON: "+JSONString);
-
-        } catch (Exception e){
-            e.printStackTrace();
-            return null;
-        } finally {
-            if(urlConnection != null){
-                urlConnection.disconnect();
-            }
-            if(reader != null){
-                try {
-                    reader.close();
-                }catch (IOException e){
-                    e.printStackTrace();
-                }
-            }
-            Log.d(LOG_TAG, "getApiInfo: "+ JSONString);
-            return JSONString;
-        }
+        Uri builtUri = Uri.parse(URL).buildUpon()
+                .appendQueryParameter("season", queryString)
+                .build();
+        competitionJSONString = connectAPI(builtUri);
+        return competitionJSONString;
     }
 
     static String getTeamInfo(String queryString){
-        HttpURLConnection urlConnection = null;
-        BufferedReader reader = null;
+
         String teamJSONString = null;
-        String FOOTBALL_BASE_URL = "http://api.football-data.org/v1/competitions/"+queryString+"/teams";
+        String URL = "http://api.football-data.org/v1/competitions/"+queryString+"/teams";
 
-        try {
-            //Build up your query URI limiting results to 10 items and printed books
-            Uri builtUri = Uri.parse(FOOTBALL_BASE_URL).buildUpon()
-                    //.appendQueryParameter(QUERY_PARAM, queryString)
-                    .appendQueryParameter(MAX_RESULTS, "10")
-                    .build();
-
-            URL requestURL = new URL(builtUri.toString());
-
-            urlConnection = (HttpURLConnection) requestURL.openConnection();
-            urlConnection.setRequestMethod("GET");
-            urlConnection.setRequestProperty("X-Auth-Token", API_TOKEN);
-            urlConnection.connect();
-            Log.d(LOG_TAG, "im connected ");
-
-            //Read the response using an inputStream and a StringBuffer, then convert it to a String
-            InputStream inputStream = urlConnection.getInputStream();
-            StringBuffer buffer = new StringBuffer();
-            if(inputStream == null){
-                return null;
-            }
-            reader = new BufferedReader(new InputStreamReader(inputStream));
-            String line;
-            while((line = reader.readLine()) != null){
-                buffer.append(line +"\n");
-            }
-            if(buffer.length() == 0){
-                Log.d(LOG_TAG, "Buffer empty ");
-                //Stream was empty. No point in parsing.
-                return null;
-            }
-            teamJSONString = buffer.toString();
-            Log.d(LOG_TAG, ""+teamJSONString);
-
-        } catch (Exception e){
-            e.printStackTrace();
-            return null;
-        } finally {
-            if(urlConnection != null){
-                urlConnection.disconnect();
-            }
-            if(reader != null){
-                try {
-                    reader.close();
-                }catch (IOException e){
-                    e.printStackTrace();
-                }
-            }
-            Log.d(LOG_TAG, "getTeamInfo: ");
-            return teamJSONString;
-        }
+        Uri builtUri = Uri.parse(URL).buildUpon()
+                .appendQueryParameter("season", queryString)
+                //.appendQueryParameter(MAX_RESULTS, "10")
+                .build();
+        teamJSONString = connectAPI(builtUri);
+        return teamJSONString;
     }
 
     static String getLeagueTable(String queryString){
@@ -157,22 +70,34 @@ public class NetworkUtils {
 
         Uri builtUri = Uri.parse(URL).buildUpon()
                 .appendQueryParameter("season", queryString)
-                .appendQueryParameter(MAX_RESULTS, "10")
+                //.appendQueryParameter(MAX_RESULTS, "10")
                 .build();
         leagueJSONString = connectAPI(builtUri);
+        Log.d(LOG_TAG, "LEAGUE TABLE json: "+leagueJSONString);
         return leagueJSONString;
     }
 
     static String getFixtures(String queryString){
         String fixturesJSONString = null;
         String URL = "http://api.football-data.org/v1/competitions/"+queryString+"/fixtures";
-        Uri builtUri = Uri.parse("http://api.football-data.org/v1/competitions/").buildUpon()
-                .appendQueryParameter("season", queryString)
-                .appendQueryParameter(MAX_RESULTS, "10")
-                .build();
+        Uri builtUri = Uri.parse(URL).buildUpon().build();
         fixturesJSONString = connectAPI(builtUri);
         return fixturesJSONString;
     }
+
+    static String getTeamFixtures(Context context){
+        String fixturesJSONString = null;
+
+        String teamId;
+        SharedPreferences prefs = context.getSharedPreferences("MyPref1",MODE_PRIVATE);
+        teamId = prefs.getString("teamURL",null);
+        String URL = teamId;
+        Uri builtUri = Uri.parse(URL+"/fixtures").buildUpon().build();
+        fixturesJSONString = connectAPI(builtUri);
+        Log.d(LOG_TAG, "HEREEEEEEEEEEEEEEEEEEEEEEEE getting the team fixtures JSON!!!!!: "+fixturesJSONString);
+        return fixturesJSONString;
+    }
+
 
     static String connectAPI(Uri builtUri){
         HttpURLConnection urlConnection = null;
@@ -203,7 +128,7 @@ public class NetworkUtils {
                 return null;
             }
             JSONString = buffer.toString();
-            Log.d(LOG_TAG, "the competitions JSON: "+JSONString);
+            //Log.d(LOG_TAG, "the competitions JSON: "+JSONString);
 
         } catch (Exception e){
             e.printStackTrace();
@@ -223,42 +148,4 @@ public class NetworkUtils {
             return JSONString;
         }
     }
-
-    static void connectToAPIwithOKHTTP() {
-        //okhttp
-        OkHttpClient client;
-        Request request;
-
-        client = new OkHttpClient().newBuilder()
-                .authenticator(new Authenticator() {
-                    @Override
-                    public Request authenticate(Route route, Response response) throws IOException {
-                        //updateRestult(response.headers().toString());
-                        //String credential = Credentials.basic("user", "passwrd");
-                        //if(credential.equals(response.request().header("Authorization")))
-                        //    return null;
-                        return response.request().newBuilder()
-                                .header("X-Auth-Token", "01238bb38ddc413fb98fbfb568d9f561")
-                                .build();
-                    }
-                }).build();
-
-        request = new Request.Builder().url("http://api.football-data.org/v1/competitions/").build();
-
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Log.i(LOG_TAG, e.getMessage());
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                Log.i(LOG_TAG, response.body().string());
-            }
-        });
-
-
-
-    }
-
 }

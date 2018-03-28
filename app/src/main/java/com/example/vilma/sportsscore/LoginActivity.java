@@ -58,7 +58,6 @@ public class LoginActivity extends AppCompatActivity {
 
                 Intent intentBundle = new Intent(LoginActivity.this,MainActivity.class);
                 startActivity(intentBundle);
-                Toast.makeText(LoginActivity.this, "data id: "+competitionId,Toast.LENGTH_LONG).show();
             }
         });
 
@@ -77,7 +76,7 @@ public class LoginActivity extends AppCompatActivity {
                 competitionAdapter.clear();
                 competitionAdapter.notifyDataSetChanged();
                 loadCompetitions();
-                Toast.makeText(getBaseContext(),queryString+" selected", Toast.LENGTH_LONG).show();
+                Toast.makeText(getBaseContext(),"Loading "+queryString+" competitions...", Toast.LENGTH_SHORT).show();
             }
 
             @Override

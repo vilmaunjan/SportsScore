@@ -14,8 +14,7 @@ import org.json.JSONObject;
 
 public class FetchCompetitions extends AsyncTask<String, Void, String> {
 
-    private static final String LOG_TAG = NetworkUtils.class.getSimpleName();
-    final String COMPETITIONS_URL = "http://api.football-data.org/v1/competitions/?season=2017";
+    private static final String LOG_TAG = FetchCompetitions.class.getSimpleName();
     CompetitionAdapter competitionAdapter;
     ListView competitionList;
 
@@ -25,10 +24,13 @@ public class FetchCompetitions extends AsyncTask<String, Void, String> {
     }
 
     @Override
+    protected void onProgressUpdate(Void... values) {
+        super.onProgressUpdate(values);
+    }
+
+    @Override
     protected String doInBackground(String... strings) {
-        Log.i(LOG_TAG,"3. At do ini background");
-        //NetworkUtils.connectToAPI();
-        return NetworkUtils.getAPIInfo(strings[0], COMPETITIONS_URL);
+        return NetworkUtils.getCompetitionsInfo(strings[0]);
     }
 
     @Override

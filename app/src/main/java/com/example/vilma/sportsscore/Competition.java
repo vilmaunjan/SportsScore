@@ -65,7 +65,4 @@ public class Competition {
         this.numGames = numDays;
     }
 
-
-
-
 }

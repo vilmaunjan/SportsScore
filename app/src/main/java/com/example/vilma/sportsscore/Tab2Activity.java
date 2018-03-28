@@ -1,17 +1,24 @@
 package com.example.vilma.sportsscore;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import static android.content.Context.MODE_PRIVATE;
 
 /**
  * Created by Vilma on 3/18/2018.
@@ -19,61 +26,41 @@ import android.widget.TextView;
 
 public class Tab2Activity extends Fragment {
 
-    private EditText txtSearchInput;
-    private TextView lblTeamName, lblNickname, lblMV;
-    private Button btnSearch;
+    private static final String LOG_TAG = Tab2Activity.class.getSimpleName();
+    private ListView listLeagueTable;
+    private LeagueTableAdapter leagueAdapter;
+    String competitionId;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.tab2, container, false);
 
-        /*txtSearchInput = (EditText) rootView.findViewById(R.id.searchTeam);
-        lblTeamName = (TextView) rootView.findViewById(R.id.txtTeamName);
-        lblNickname = (TextView) rootView.findViewById(R.id.txtNickname);
-        lblMV = (TextView) rootView.findViewById(R.id.txtMV);
-        btnSearch = (Button) rootView.findViewById(R.id.btnSearch);
-        btnSearch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                searchTeams(v);
-            }
-        });
-        */
+        String competitionId;
+        SharedPreferences prefs = getActivity().getSharedPreferences("MyPref1",MODE_PRIVATE);
+        competitionId = prefs.getString("competitionID",null);
+
+        listLeagueTable = (ListView) rootView.findViewById(R.id.listLeague);
+        leagueAdapter = new LeagueTableAdapter(rootView.getContext(), R.layout.league_custom_layout);
+        listLeagueTable.setAdapter(leagueAdapter);
+        loadLeagueTable(competitionId);
 
         return rootView;
     }
 
 
-    public void searchTeams(View view) {
-        String queryString = txtSearchInput.getText().toString();
-
-        //For hiding the keyboard when the search buttton is clicked
-        InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),
-                InputMethodManager.HIDE_NOT_ALWAYS);
-
+    public void loadLeagueTable(String competitionId) {
         //For checking the network state and empty search field case
         ConnectivityManager connMgr = (ConnectivityManager) getActivity()
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        Log.i(LOG_TAG,"1. Made it to loadLeagueTable");
 
-        if (networkInfo != null && networkInfo.isConnected() && queryString.length() != 0) {
-            ///new FetchTeam(lblTeamName, lblNickname, lblMV).execute(queryString);
-            lblNickname.setText("");
-            lblNickname.setText("");
-            lblTeamName.setText("Loading...");
-
+        if (networkInfo != null && networkInfo.isConnected()) {
+            Log.i(LOG_TAG,"2. Made it to the if statement in load league table");
+            new FetchLeagueTable(leagueAdapter, listLeagueTable).execute(competitionId);
         } else {
-            if (queryString.length() == 0) {
-                lblNickname.setText("");
-                lblTeamName.setText("Please enter a search term");
-                lblMV.setText("");
-            } else {
-                lblNickname.setText("");
-                lblTeamName.setText("Please enter your network your network connection and try again");
-                lblMV.setText("");
-            }
+            Log.i(LOG_TAG,"2. DID NOT ENTER THE IF");
         }
     }
 
